@@ -108,27 +108,25 @@ To test immediately:
 
 ## How It Works
 
-┌──────────────────────────────────────────────────────────────┐
-│                        USER FLOW                             │
-│                                                              │
-│  STEP 1        STEP 2              STEP 3                    │
-│ ┌─────────┐   ┌─────────┐   ┌──────────────────────────┐     │
-│ │ Paste   │ → │ Parse   │ → │ Adaptive Conversational  │     │
-│ │ JD +    │   │ & Map   │   │ Assessment               │     │
-│ │ Resume  │   │         │   │                          │     │
-│ └─────────┘   └─────────┘   └──────────┬───────────────┘     │
-│                                        │                     │
-│                          STEP 4        │        STEP 5       │
-│                   ┌──────────────┐     │    ┌──────────────┐  │
-│                   │ Results      │ ◀────┘    Personalised │  │
-│                   │ Dashboard    │          │ Learning Plan│  │
-│                   │ + Gap Score  │ ─────────▶              │ │
-│                   └──────────────┘          └──────┬───────┘ │
-│                                                    │         │
-│                                                    ▼         │
-│                                      📄 PDF Report Download  │
-└──────────────────────────────────────────────────────────────┘
+```text
+┌──────────────────────────────── USER FLOW ────────────────────────────────┐
 
+  Step 1               Step 2                  Step 3
+  ──────               ──────                  ────────────────────────────
+  Paste JD + Resume -> Parse & Map ---------> Adaptive Skill Assessment
+                                                 |
+                                                 |
+                                                 v
+
+  Step 4                                      Step 5
+  ────────────────────────────────            ────────────────────────────
+  Results Dashboard + Gap Score  ---------->  Personalised Learning Plan
+                                                     |
+                                                     v
+                                            PDF Report Download
+
+└───────────────────────────────────────────────────────────────────────────┘
+```
 text
 
 ### Step 1 — Input
