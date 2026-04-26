@@ -116,19 +116,13 @@ def analyze(skill_map: dict, results: list[dict],
         f"assessed {s['assessed']:.0%}, gap {s['gap']:.0%}, {s['claim_accuracy']}"
         for s in breakdown[:10]
     )
-    obs_prompt = f"""Write a 3-4 sentence professional summary of this candidate's
-readiness for the role: {jd_parsed.get('title', 'the role')}.
-
-Readiness: {readiness:.0%}
-Strengths: {', '.join(strengths) or 'None'}
-Critical gaps: {', '.join(critical_gaps) or 'None'}
-
-Skill details:
-{detail}
-
-Be specific, constructive, and honest. Name actual skills.
-Return ONLY the summary text.
-"""
+    obs_prompt = (
+        f"Write 2 sentences summarizing this candidate for {jd_parsed.get('title','the role')}. "
+        f"Readiness: {readiness:.0%}. "
+        f"Strengths: {', '.join(strengths[:3]) or 'None'}. "
+        f"Gaps: {', '.join(critical_gaps[:3]) or 'None'}. "
+        f"Be specific and constructive. Return only the summary."
+    )
     overall_obs = call_llm(obs_prompt, temperature=0.3)
 
     return {
