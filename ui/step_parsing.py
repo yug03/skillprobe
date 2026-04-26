@@ -3,8 +3,7 @@ Step 2 — Parsing & Skill Mapping.
 Shows what was found, builds the assessment queue.
 """
 import streamlit as st
-from agents.parser_agent  import parse_jd, parse_resume
-from agents.skill_mapper  import map_skills
+from agents.parser_agent import parse_all
 from agents.assessment_engine import AssessmentEngine
 from core import state
 from ui.styles import badge
@@ -15,21 +14,17 @@ def render():
 
     # ── Run parsing only once ──────────────────────────────────────
     if not state.get("parsing_done"):
-        with st.status("Analysing job description...", expanded=True) as status:
+                with st.status("Analysing documents...", expanded=True) as status:
             try:
-                st.write("📋 Reading job description...")
-                jd_parsed = parse_jd(state.get("jd_text"))
-                state.set("jd_parsed", jd_parsed)
-
-                st.write("📄 Reading resume...")
-                resume_parsed = parse_resume(state.get("resume_text"))
+                st.write("📋 Reading job description and resume...")
+                jd_parsed, resume_parsed, skill_map = parse_all(
+                    state.get("jd_text"),
+                    state.get("resume_text"),
+                )
+                state.set("jd_parsed",     jd_parsed)
                 state.set("resume_parsed", resume_parsed)
-
-                st.write("🗺️ Mapping skill overlap...")
-                skill_map = map_skills(jd_parsed, resume_parsed)
-                state.set("skill_map", skill_map)
-
-                state.set("parsing_done", True)
+                state.set("skill_map",     skill_map)
+                state.set("parsing_done",  True)
                 status.update(label="✅ Analysis complete!", state="complete")
             except Exception as e:
                 status.update(label="❌ Parsing failed", state="error")
