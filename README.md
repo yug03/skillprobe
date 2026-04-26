@@ -79,7 +79,7 @@ It gives the candidate:
 
 ## Live Demo
 
-**Deployed URL:** [https://YOUR-APP-NAME.streamlit.app](https://YOUR-APP-NAME.streamlit.app)
+**Deployed URL:** [(https://skillprobe-yug.streamlit.app/)]
 
 To test immediately:
 1. Open the URL above
@@ -94,7 +94,7 @@ To test immediately:
 
 ## Demo Video
 
-**Video Link:** [https://YOUR-VIDEO-URL-HERE](https://YOUR-VIDEO-URL-HERE)
+**Video Link:** [https://drive.google.com/drive/folders/1gLH3-8Pv6NugBE_M7-kOR-OSclcOR78z?usp=drive_link]
 
 **What the video covers (3-4 minutes):**
 - Uploading a real AI Automation Engineer JD and candidate resume
@@ -106,7 +106,6 @@ To test immediately:
 
 ---
 
-## How It Works
 ## How It Works
 
 ┌──────────────────────────────────────────────────────────────┐
