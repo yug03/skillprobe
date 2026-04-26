@@ -8,16 +8,22 @@ GLOBAL_CSS = """
 /* ── Reset & Base ─────────────────────────────────────── */
 * { box-sizing: border-box; }
 
-/* Hide Streamlit chrome */
-#MainMenu { visibility: hidden; }
-footer    { visibility: hidden; }
-header    { visibility: hidden; }
+/* Hide Streamlit chrome completely */
+#MainMenu            { visibility: hidden; }
+footer               { visibility: hidden; }
+header               { visibility: hidden; }
+
+/* Hide sidebar toggle arrow button completely */
+[data-testid="collapsedControl"] { display: none !important; }
+section[data-testid="stSidebar"] { display: none !important; }
 
 /* Main container */
 .main .block-container {
-    padding-top: 2rem;
+    padding-top: 1rem;
     padding-bottom: 3rem;
-    max-width: 900px;
+    padding-left: 2rem;
+    padding-right: 2rem;
+    max-width: 100%;
 }
 
 /* ── Typography ───────────────────────────────────────── */
