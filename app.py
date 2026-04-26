@@ -76,11 +76,6 @@ def make_step_html(current):
 
 
 # ── Navbar ─────────────────────────────────────────────────────────────────────
-st.markdown(
-    '<div style="background:#0D0D1A;border-bottom:1px solid #1E1E35;'
-    'padding:0.6rem 2rem;margin:-1rem -1rem 0 -1rem"></div>',
-    unsafe_allow_html=True,
-)
 
 c_logo, c_steps, c_actions = st.columns([2, 7, 3])
 
