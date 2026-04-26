@@ -60,7 +60,6 @@ def render():
             st.rerun()
         return
 
-    # ── Run parsing only once ─────────────────────────────────────────────────
     if not state.get("parsing_done"):
         with st.status("Analysing documents...", expanded=True) as status:
             try:
@@ -100,26 +99,15 @@ def render():
     extra = skill_map.get("extra_skills", [])
     queue = skill_map.get("assessment_queue", [])
 
-    # ── Top summary card ──────────────────────────────────────────────────────
     st.markdown(
-        '<div class="sp-card-highlight">'
-        '<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap">'
-        '<div>'
-        '<div class="sp-label">Analysis Complete</div>'
-        '<div style="font-size:1.28rem;font-weight:800;color:#E2E8F0;margin-bottom:0.35rem">Your profile has been mapped against the target role</div>'
-        '<div style="color:#94A3B8;font-size:0.9rem;line-height:1.6;max-width:860px">SkillProbe extracted the target role requirements, identified your claimed skills, and prepared a priority queue for adaptive verification.</div>'
-        '</div>'
-        '<div style="display:flex;gap:0.5rem;flex-wrap:wrap">'
+        '<div class="sp-card-highlight"><div style="display:flex;align-items:flex-start;justify-content:space-between;gap:1rem;flex-wrap:wrap"><div><div class="sp-label">Analysis Complete</div><div style="font-size:1.28rem;font-weight:800;color:#E2E8F0;margin-bottom:0.35rem">Your profile has been mapped against the target role</div><div style="color:#94A3B8;font-size:0.9rem;line-height:1.6;max-width:860px">SkillProbe extracted the target role requirements, identified your claimed skills, and prepared a priority queue for adaptive verification.</div></div><div style="display:flex;gap:0.5rem;flex-wrap:wrap">'
         f'{styles.badge(f"{len(queue)} queued", "cyan")}'
         f'{styles.badge(f"{len(matched)} matched", "match")}'
         f'{styles.badge(f"{len(missing)} missing", "gap")}'
-        '</div>'
-        '</div>'
-        '</div>',
+        '</div></div></div>',
         unsafe_allow_html=True,
     )
 
-    # ── Metrics ───────────────────────────────────────────────────────────────
     m1, m2, m3, m4 = st.columns(4)
     with m1:
         st.markdown(styles.metric_card(str(len(required_skills)), "Required Skills", color="cyan"), unsafe_allow_html=True)
@@ -130,7 +118,6 @@ def render():
     with m4:
         st.markdown(styles.metric_card(str(len(queue)), "Skills To Assess", color="amber"), unsafe_allow_html=True)
 
-    # ── Two-column comparison ─────────────────────────────────────────────────
     col1, col2 = st.columns(2, gap="large")
 
     with col1:
@@ -139,13 +126,7 @@ def render():
         experience = jd_parsed.get("experience_years", "N/A")
 
         st.markdown(
-            f'<div class="sp-card">'
-            f'<div class="sp-label">Target Role</div>'
-            f'<div style="font-size:1.22rem;font-weight:800;color:#E2E8F0;margin-bottom:0.45rem">{title}</div>'
-            f'<div style="color:#94A3B8;font-size:0.88rem;line-height:1.65;margin-bottom:0.9rem">{role_summary}</div>'
-            f'<div style="color:#64748B;font-size:0.78rem;margin-bottom:0.8rem">Experience required: {experience}</div>'
-            f'<div class="sp-label">Required Skills</div>'
-            f'</div>',
+            f'<div class="sp-card"><div class="sp-label">Target Role</div><div style="font-size:1.22rem;font-weight:800;color:#E2E8F0;margin-bottom:0.45rem">{title}</div><div style="color:#94A3B8;font-size:0.88rem;line-height:1.65;margin-bottom:0.9rem">{role_summary}</div><div style="color:#64748B;font-size:0.78rem;margin-bottom:0.8rem">Experience required: {experience}</div><div class="sp-label">Required Skills</div></div>',
             unsafe_allow_html=True,
         )
 
@@ -166,14 +147,7 @@ def render():
         education = resume_parsed.get("education", "")
 
         st.markdown(
-            f'<div class="sp-card">'
-            f'<div class="sp-label">Candidate Profile</div>'
-            f'<div style="font-size:1.22rem;font-weight:800;color:#E2E8F0;margin-bottom:0.45rem">{name}</div>'
-            f'<div style="color:#94A3B8;font-size:0.88rem;line-height:1.65;margin-bottom:0.9rem">{summary}</div>'
-            f'<div style="color:#64748B;font-size:0.78rem;margin-bottom:0.2rem">Experience: {experience}</div>'
-            f'<div style="color:#64748B;font-size:0.78rem;margin-bottom:0.8rem">Education: {education if education else "N/A"}</div>'
-            f'<div class="sp-label">Claimed Skills</div>'
-            f'</div>',
+            f'<div class="sp-card"><div class="sp-label">Candidate Profile</div><div style="font-size:1.22rem;font-weight:800;color:#E2E8F0;margin-bottom:0.45rem">{name}</div><div style="color:#94A3B8;font-size:0.88rem;line-height:1.65;margin-bottom:0.9rem">{summary}</div><div style="color:#64748B;font-size:0.78rem;margin-bottom:0.2rem">Experience: {experience}</div><div style="color:#64748B;font-size:0.78rem;margin-bottom:0.8rem">Education: {education if education else "N/A"}</div><div class="sp-label">Claimed Skills</div></div>',
             unsafe_allow_html=True,
         )
 
@@ -188,7 +162,6 @@ def render():
 
     st.markdown(styles.divider(), unsafe_allow_html=True)
 
-    # ── Mapping summary ───────────────────────────────────────────────────────
     b1, b2, b3 = st.columns(3)
 
     with b1:
@@ -205,12 +178,8 @@ def render():
 
     st.markdown(styles.divider(), unsafe_allow_html=True)
 
-    # ── Assessment queue ──────────────────────────────────────────────────────
     st.markdown(styles.section_title("🎯", "Assessment Queue"), unsafe_allow_html=True)
-    st.markdown(
-        '<div style="color:#64748B;font-size:0.88rem;margin-bottom:1rem">The adaptive assessment will verify these skills in priority order. Higher-impact role requirements are assessed first.</div>',
-        unsafe_allow_html=True,
-    )
+    st.markdown('<div style="color:#64748B;font-size:0.88rem;margin-bottom:1rem">The adaptive assessment will verify these skills in priority order. Higher-impact role requirements are assessed first.</div>', unsafe_allow_html=True)
 
     if queue:
         matched_lookup = {}
@@ -221,13 +190,8 @@ def render():
             source = matched_lookup.get(skill, {})
             kind = _importance_kind(_importance_of(source))
             importance_text = str(_importance_of(source)).replace("_", " ").title()
-
             st.markdown(
-                f'<div style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1rem;border:1px solid #1A1A2E;border-radius:12px;background:#0F0F18;margin-bottom:0.5rem">'
-                f'<span style="color:#A5B4FC;font-weight:800;width:24px">{i}</span>'
-                f'{styles.badge(skill, kind=kind)}'
-                f'<span style="color:#64748B;font-size:0.8rem;margin-left:auto">{importance_text}</span>'
-                f'</div>',
+                f'<div style="display:flex;align-items:center;gap:0.8rem;padding:0.8rem 1rem;border:1px solid #1A1A2E;border-radius:12px;background:#0F0F18;margin-bottom:0.5rem"><span style="color:#A5B4FC;font-weight:800;width:24px">{i}</span>{styles.badge(skill, kind=kind)}<span style="color:#64748B;font-size:0.8rem;margin-left:auto">{importance_text}</span></div>',
                 unsafe_allow_html=True,
             )
     else:
@@ -235,11 +199,14 @@ def render():
 
     st.markdown('<div style="height:0.8rem"></div>', unsafe_allow_html=True)
 
-    # ── CTA ───────────────────────────────────────────────────────────────────
     c1, c2, c3 = st.columns([3, 4, 3])
     with c2:
         if st.button("Start Assessment →", type="primary", use_container_width=True, key="start_assessment"):
-            engine = AssessmentEngine(skill_map)
+            engine = AssessmentEngine(
+                skill_map=skill_map,
+                jd_parsed=jd_parsed,
+                resume_parsed=resume_parsed,
+            )
             state.set("assessment_engine", engine)
             state.set("conversation_log", [])
             state.set("current_question", None)
