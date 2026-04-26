@@ -137,10 +137,7 @@ def _enrich_with_resources(plan: dict) -> dict:
             except Exception:
                 sk["resources"] = []
 
-            try:
-                sk["project_links"] = find_project_ideas(skill)
-            except Exception:
-                sk["project_links"] = []
+            sk["project_links"] = []
 
     return plan
 
