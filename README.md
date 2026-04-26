@@ -165,125 +165,78 @@ The agent runs a **Computerised Adaptive Testing (CAT)** inspired assessment:
 ---
 
 ## Architecture Diagram
-┌──────────────────────────────────────────────────────────────────────────────────────────────┐
-│                                  SKILLPROBE AGENT SYSTEM                                    │
-└──────────────────────────────────────────────────────────────────────────────────────────────┘
+```text
++----------------------------------------------------------------------------------+
+|                              SKILLPROBE AGENT SYSTEM                             |
++----------------------------------------------------------------------------------+
 
-  INPUT LAYER
-  ┌───────────────────────────────┐              ┌───────────────────────────────┐
-  │ Job Description               │              │ Resume                        │
-  │ (text / file upload)          │              │ (text / file upload)          │
-  └───────────────┬───────────────┘              └───────────────┬───────────────┘
-                  └──────────────────────────┬───────────────────┘
-                                             ▼
-  ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-  │ PARSER AGENT                                                                             │
-  │ ---------------------------------------------------------------------------------------- │
-  │ Single LLM-driven parsing flow that extracts:                                            │
-  │ • JD structure and required skills                                                       │
-  │ • Resume profile and claimed skills                                                      │
-  │ • Required vs claimed skill map                                                          │
-  │ • Prioritised assessment queue                                                           │
-  │                                                                                          │
-  │ Outputs: jd_parsed, resume_parsed, skill_map, assessment_queue                           │
-  └──────────────────────────────────────────────┬───────────────────────────────────────────┘
-                                                 ▼
+INPUT LAYER
+  [Job Description (text/file)]      [Resume (text/file)]
+                  \                        /
+                   \                      /
+                    +------ Input -------+
+                             |
+                             v
 
-  ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-  │ ADAPTIVE ASSESSMENT ENGINE (CAT)                                                         │
-  │ ---------------------------------------------------------------------------------------- │
-  │ Core agentic loop that verifies skill proficiency one skill at a time.                   │
-  │                                                                                          │
-  │  Per-skill state: SkillState                                                             │
-  │  ┌────────────────────────────────────────────────────────────────────────────────────┐  │
-  │  │ • Claimed proficiency → starting difficulty                                        │  │
-  │  │ • History of Q&A pairs with evaluation scores                                      │  │
-  │  │ • Confidence tracking (consistency + evidence coverage)                            │  │
-  │  │ • Difficulty ceiling used to cap final proficiency                                 │  │
-  │  └────────────────────────────────────────────────────────────────────────────────────┘  │
-  │                                                                                          │
-  │  For each skill in queue:                                                                │
-  │  ┌────────────────────────────────────────────────────────────────────────────────────┐  │
-  │  │ 1. generate_question()  → adaptive question based on current difficulty            │  │
-  │  │ 2. candidate answers                                                               │  │
-  │  │ 3. evaluate()           → answer scored across quality dimensions                  │  │
-  │  │ 4. record()             → update difficulty, confidence, and stop condition        │  │
-  │  │ 5. If confidence < threshold and question count < max → ask next adaptive question │  │
-  │  │ 6. Else stop skill assessment and compute final proficiency                        │  │
-  │  └────────────────────────────────────────────────────────────────────────────────────┘  │
-  │                                                                                          │
-  │  Then move automatically to the next skill until queue completion.                       │
-  └──────────────────────────────────────────────┬───────────────────────────────────────────┘
-                                                 ▼
+PARSER AGENT
+  - Parse JD
+  - Parse Resume
+  - Map required vs claimed skills
+  - Build assessment queue
 
-  ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-  │ GAP ANALYZER                                                                             │
-  │ ---------------------------------------------------------------------------------------- │
-  │ Computes evidence-based readiness and skill gaps.                                        │
-  │                                                                                          │
-  │ For each skill:                                                                          │
-  │ • gap = required_proficiency - assessed_proficiency                                      │
-  │ • claim_accuracy = claimed_proficiency - assessed_proficiency                            │
-  │                                                                                          │
-  │ Overall readiness:                                                                       │
-  │ • readiness = 1 - weighted_average_gap                                                   │
-  │ • weights: critical = 3, important = 2, nice_to_have = 1                                 │
-  │                                                                                          │
-  │ Outputs:                                                                                 │
-  │ • readiness_score                                                                        │
-  │ • hire_ready_weeks                                                                       │
-  │ • strengths                                                                              │
-  │ • critical_gaps                                                                          │
-  │ • quick_wins                                                                             │
-  └──────────────────────────────────────────────┬───────────────────────────────────────────┘
-                                                 ▼
+  Outputs:
+  jd_parsed, resume_parsed, skill_map, assessment_queue
+                             |
+                             v
 
-  ┌──────────────────────────────────────────────────────────────────────────────────────────┐
-  │ LEARNING PLAN AGENT                                                                      │
-  │ ---------------------------------------------------------------------------------------- │
-  │ Builds a phased, personalised roadmap from verified gaps and adjacent strengths.         │
-  │                                                                                          │
-  │ Inputs:                                                                                  │
-  │ • gap analysis                                                                           │
-  │ • full candidate skill profile                                                           │
-  │                                                                                          │
-  │ Phases:                                                                                  │
-  │ • Phase 1: Quick Wins                                                                    │
-  │ • Phase 2: Core Gaps                                                                     │
-  │ • Phase 3: Advanced Progression                                                          │
-  │                                                                                          │
-  │ Per skill plan includes:                                                                 │
-  │ • Adjacent skill reasoning (leveraging what the candidate already knows)                 │
-  │ • Estimated learning hours                                                               │
-  │ • Milestones                                                                             │
-  │ • Hands-on project                                                                       │
-  │ • Real resource links via DuckDuckGo search                                              │
-  └──────────────────────────────────────────────┬───────────────────────────────────────────┘
-                                                 ▼
+ADAPTIVE ASSESSMENT ENGINE (CAT)
+  Per SkillState:
+  - claimed proficiency -> starting difficulty
+  - Q&A history
+  - confidence
+  - max difficulty
+  - final assessed proficiency
 
-  OUTPUT LAYER
-  ┌────────────────────────────────────┐                  ┌────────────────────────────────────┐
-  │ Results UI                         │                  │ PDF Report                         │
-  │ Streamlit + Plotly dashboard       │                  │ fpdf2-generated professional report│
-  │ • Readiness                        │                  │ • Assessment summary               │
-  │ • Skill breakdown                  │                  │ • Skill scores                     │
-  │ • Gaps and strengths               │                  │ • Gap analysis                     │
-  │ • Charts and plan                  │                  │ • Learning roadmap                 │
-  └────────────────────────────────────┘                  └────────────────────────────────────┘
+  Loop per skill:
+  generate_question()
+        ->
+  candidate answer
+        ->
+  evaluate()
+        ->
+  record() and update difficulty/confidence
+        ->
+  stop or continue
+        ->
+  move to next skill
+                             |
+                             v
 
+GAP ANALYZER
+  - compare required vs assessed
+  - compute claim accuracy
+  - calculate readiness score
+  - identify strengths / gaps / quick wins
+                             |
+                             v
 
-  SHARED INFRASTRUCTURE
-  ┌────────────────────────────────────┐                  ┌────────────────────────────────────┐
-  │ LLM CLIENT                         │                  │ SESSION STATE                      │
-  │ • Primary: Gemini 2.0 Flash        │                  │ core/state.py                      │
-  │ • Backup: Groq Llama 3.3 70B       │                  │ Single source of truth for:        │
-  │ • Retry + fallback logic           │                  │ • current step                     │
-  │                                    │                  │ • parsed docs                      │
-  │                                    │                  │ • assessment engine                │
-  │                                    │                  │ • conversation log                 │
-  │                                    │                  │ • results and plan                 │
-  └────────────────────────────────────┘                  └────────────────────────────────────┘
+LEARNING PLAN AGENT
+  - Phase 1: Quick Wins
+  - Phase 2: Core Gaps
+  - Phase 3: Advanced
+  - adjacent skill reasoning
+  - milestones + projects
+  - real resource links
+                             |
+                             v
 
+OUTPUT LAYER
+  [Results Dashboard]                [PDF Report]
+
+SHARED INFRASTRUCTURE
+  [LLM CLIENT]                       [SESSION STATE]
+  Gemini + Groq fallback             central app state
+```
 text
 
 ---
