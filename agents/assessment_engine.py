@@ -267,12 +267,20 @@ Return this exact JSON:
         }
 
     def _observe(self, state: SkillState) -> str:
-        """Generate a short human-readable observation for a completed skill."""
-        history_lines = "\n".join(
-            f"Q{i+1} (Level {h['difficulty']}): {h['quality']} — {h['score']:.0%}"
-            for i, h in enumerate(state.history)
-        )
-        prompt = f"""Write a 1-2 sentence professional observation about this skill assessment.
+      """Generate observation — skipped during assessment to save tokens.
+      Observations are generated in bulk by gap_analyzer instead."""
+      scores = [h["score"] for h in state.history]
+      avg    = sum(scores) / len(scores) if scores else 0
+      max_d  = state.max_diff
+  
+      if avg >= 0.8 and max_d >= 3:
+          return "Strong demonstrated proficiency across difficulty levels."
+      elif avg >= 0.6:
+          return "Solid foundational knowledge with some gaps at advanced levels."
+      elif avg >= 0.4:
+          return "Partial understanding demonstrated. Core concepts present but depth is limited."
+      else:
+          return "Limited demonstrated proficiency. Foundational study recommended."
 
 Skill: {state.skill}
 Claimed: {state.claimed:.0%} | Assessed: {state.proficiency:.0%}
