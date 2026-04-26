@@ -1,0 +1,40 @@
+Sarah Chen
+Software Engineer | AI Enthusiast
+sarah.chen@email.com | github.com/sarahchen
+
+SUMMARY
+Software engineer with 3 years experience building backend systems and data pipelines.
+Passionate about AI/ML. Transitioning into AI engineering.
+Strong Python and REST API background with growing LLM experience.
+
+EXPERIENCE
+
+Software Engineer — DataFlow Inc (2021–Present)
+- Built and maintained REST APIs using Flask (10K+ daily requests)
+- Designed PostgreSQL schemas, optimised SQL queries
+- Implemented automated testing with pytest (85% coverage)
+- Containerised apps using Docker for dev and staging
+- Used AWS S3 and EC2 for deployments
+- Integrated ML models built by data science team
+
+Junior Developer — AppStart (2020–2021)
+- Built Python data processing pipelines (Pandas, NumPy)
+- Developed web features (Python + JavaScript)
+- Git, code reviews, agile workflow
+
+PROJECTS
+- AI Assistant: Built chatbot using OpenAI API + ChromaDB for RAG.
+  Used LangChain for prompt chaining. Deployed on Streamlit Cloud.
+- ETL Pipeline: Automated data pipeline processing 1M+ records/day
+  using Airflow + Pandas.
+
+SKILLS
+Python, Flask, PostgreSQL, SQL, Docker, AWS (S3/EC2), Git,
+REST APIs, Pandas, NumPy, pytest, JavaScript,
+LangChain (basic), OpenAI API, ChromaDB (basic), Streamlit, Linux
+
+EDUCATION
+B.S. Computer Science — State University (2020)
+
+CERTIFICATIONS
+AWS Cloud Practitioner, Google IT Automation with Python

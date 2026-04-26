@@ -1,0 +1,30 @@
+AI Automation Engineer
+
+We are building AI-powered automation systems and looking for an engineer who can design, build, and deploy intelligent pipelines.
+
+Responsibilities:
+- Design and build AI/ML pipelines and automation workflows
+- Build and deploy REST APIs using Python (FastAPI preferred)
+- Work with LLMs (GPT-4, Gemini, Claude) and prompt engineering
+- Build RAG (Retrieval-Augmented Generation) systems
+- Work with vector databases (Pinecone, ChromaDB, Weaviate)
+- Containerise applications with Docker, deploy to AWS or GCP
+- Set up CI/CD pipelines, monitoring, and observability
+- Write clean, tested, well-documented code
+
+Requirements:
+- 2+ years software engineering experience
+- Strong Python skills
+- FastAPI or Flask for API development
+- Hands-on LLM API experience and prompt engineering
+- Understanding of RAG architecture
+- Docker and containerisation
+- Cloud platforms: AWS or GCP
+- SQL and database design
+- Git, CI/CD workflows
+
+Nice to Have:
+- LangChain or LlamaIndex
+- Kubernetes
+- Terraform / Infrastructure as Code
+- Grafana, Prometheus for monitoring
