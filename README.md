@@ -9,7 +9,7 @@
 
 **A resume tells you what someone claims to know. SkillProbe verifies what they actually know.**
 
-[🚀 Live Demo](YOUR_STREAMLIT_URL_HERE) • [📹 Demo Video](YOUR_VIDEO_URL_HERE) • [📁 Source Code](YOUR_GITHUB_URL_HERE)
+[🚀 Live Demo](https://skillprobe-yug.streamlit.app/) • [📹 Demo Video](https://drive.google.com/drive/folders/1gLH3-8Pv6NugBE_M7-kOR-OSclcOR78z?usp=drive_link) • [📁 Source Code]((https://github.com/yug03/skillprobe.git))
 
 </div>
 
