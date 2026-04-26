@@ -1,80 +1,158 @@
 """
-Parser Agent — extract structured skills from JD and resume.
+Parser Agent — parse JD, resume, and map skills in ONE single LLM call.
+Was 3 calls. Now 1 call. Saves 66% of parsing tokens.
 """
 from models.llm_client import call_llm_json
 
 
 def parse_jd(jd_text: str) -> dict:
-    prompt = f"""You are a job description analyst.
+    """Parse JD only — used when resume not yet available."""
+    prompt = f"""Extract skills from this job description. Be concise.
 
-Extract structured information from this job description.
+JD:
+{jd_text[:3000]}
 
-JD TEXT:
----
-{jd_text}
----
-
-Return this exact JSON:
+Return JSON:
 {{
     "title": "job title",
-    "role_summary": "one sentence of what this role does",
+    "role_summary": "one sentence",
     "experience_years": number or null,
     "required_skills": [
         {{
-            "skill": "concise skill name (e.g. Python, Docker, FastAPI)",
+            "skill": "name",
             "importance": "critical" or "important" or "nice_to_have",
-            "required_proficiency": 0.0 to 1.0,
-            "category": "programming" or "framework" or "tool" or "cloud" or "concept" or "devops" or "data" or "other"
+            "required_proficiency": 0.0-1.0,
+            "category": "programming/framework/tool/cloud/concept/devops/data/other"
         }}
     ]
 }}
-
-Rules:
-- critical = explicitly required, mentioned multiple times, or listed under Requirements
-- important = clearly expected but not blocking
-- nice_to_have = bonus, preferred, or mentioned once lightly
-- required_proficiency: critical senior skill = 0.8+, important = 0.6, nice = 0.4
-- Extract ALL skills including implied ones
-- Normalize names: JS → JavaScript, k8s → Kubernetes
-- Order by importance descending
-"""
+Rules: critical=explicitly required, important=expected, nice_to_have=bonus.
+Normalize names: JS->JavaScript, k8s->Kubernetes. Max 12 skills."""
     return call_llm_json(prompt, temperature=0.1)
 
 
 def parse_resume(resume_text: str) -> dict:
-    prompt = f"""You are a resume analyst.
-
-Extract structured skill information from this resume.
+    """Parse resume only."""
+    prompt = f"""Extract skills from this resume. Be concise.
 
 RESUME:
----
-{resume_text}
----
+{resume_text[:3000]}
 
-Return this exact JSON:
+Return JSON:
 {{
-    "name": "candidate full name",
-    "experience_years": total professional experience as number,
-    "education": "highest degree and field",
-    "summary": "one sentence describing this candidate",
+    "name": "candidate name",
+    "experience_years": number,
+    "education": "degree and field",
+    "summary": "one sentence",
     "skills": [
         {{
-            "skill": "concise skill name",
-            "claimed_proficiency": 0.0 to 1.0,
-            "evidence": "brief reason for this rating",
+            "skill": "name",
+            "claimed_proficiency": 0.0-1.0,
+            "evidence": "brief reason",
             "years_used": number or null
         }}
     ]
 }}
-
-Proficiency rating guide:
-- Mentioned only in skills list → 0.3
-- Used in 1 project → 0.45
-- Used across multiple projects → 0.6
-- Led or architected with it → 0.72
-- Expert indicators (published, taught, contributed) → 0.85+
-- Be conservative. Do not inflate.
-
-Normalize skill names. Extract everything — explicit and implied.
-"""
+Proficiency: listed-only=0.3, used-in-project=0.5, multiple-projects=0.65,
+led/architected=0.75, expert-indicators=0.88. Be conservative."""
     return call_llm_json(prompt, temperature=0.1)
+
+
+def parse_all(jd_text: str, resume_text: str) -> tuple[dict, dict, dict]:
+    """
+    Parse JD + Resume + Map skills in ONE single LLM call.
+    Saves 2 LLM calls vs calling each function separately.
+    Returns (jd_parsed, resume_parsed, skill_map)
+    """
+    prompt = f"""You are a skill extraction and matching engine.
+Do THREE things in one response.
+
+JOB DESCRIPTION:
+{jd_text[:2500]}
+
+RESUME:
+{resume_text[:2500]}
+
+Return ONE JSON object with this exact structure:
+{{
+    "jd": {{
+        "title": "job title",
+        "role_summary": "one sentence",
+        "experience_years": number or null,
+        "required_skills": [
+            {{
+                "skill": "name",
+                "importance": "critical" or "important" or "nice_to_have",
+                "required_proficiency": 0.0-1.0,
+                "category": "programming/framework/tool/cloud/concept/devops/data/other"
+            }}
+        ]
+    }},
+    "resume": {{
+        "name": "candidate name",
+        "experience_years": number,
+        "education": "degree and field",
+        "summary": "one sentence",
+        "skills": [
+            {{
+                "skill": "name",
+                "claimed_proficiency": 0.0-1.0,
+                "evidence": "brief reason",
+                "years_used": number or null
+            }}
+        ]
+    }},
+    "skill_map": {{
+        "matched_skills": [
+            {{
+                "skill": "JD skill name",
+                "importance": "critical/important/nice_to_have",
+                "required_proficiency": 0.0-1.0,
+                "claimed_proficiency": 0.0-1.0,
+                "category": "category",
+                "resume_evidence": "brief"
+            }}
+        ],
+        "missing_skills": [
+            {{
+                "skill": "required but not on resume",
+                "importance": "critical/important/nice_to_have",
+                "required_proficiency": 0.0-1.0,
+                "category": "category"
+            }}
+        ],
+        "extra_skills": ["resume skills not required by JD"]
+    }}
+}}
+
+Rules:
+- JD: max 12 skills, critical=explicitly required, normalize names
+- Resume proficiency: listed-only=0.3, project=0.5, multi-project=0.65, led=0.75
+- Skill map: handle synonyms (K8s=Kubernetes), partial matches (Flask->FastAPI lower score)
+- Be concise and conservative"""
+
+    result = call_llm_json(prompt, temperature=0.1)
+
+    jd_parsed     = result.get("jd", {})
+    resume_parsed = result.get("resume", {})
+    skill_map     = result.get("skill_map", {})
+
+    # Build assessment queue
+    skill_map["assessment_queue"] = _build_queue(skill_map)
+
+    return jd_parsed, resume_parsed, skill_map
+
+
+def _build_queue(skill_map: dict) -> list:
+    from config import MAX_SKILLS
+    order   = {"critical": 0, "important": 1, "nice_to_have": 2}
+    matched = sorted(
+        skill_map.get("matched_skills", []),
+        key=lambda s: order.get(s.get("importance", "nice_to_have"), 2)
+    )
+    missing = [
+        s for s in skill_map.get("missing_skills", [])
+        if s.get("importance") == "critical"
+    ]
+    queue = [s["skill"] for s in matched] + [s["skill"] for s in missing]
+    return queue[:MAX_SKILLS]
