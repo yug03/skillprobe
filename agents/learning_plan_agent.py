@@ -133,7 +133,7 @@ def _enrich_with_resources(plan: dict) -> dict:
                 search_level = "beginner"
 
             try:
-                sk["resources"] = find_resources(skill, level=search_level, n=4)
+                sk["resources"] = find_resources(skill, level=search_level, n=2)
             except Exception:
                 sk["resources"] = []
 
